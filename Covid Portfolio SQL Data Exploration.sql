@@ -219,35 +219,3 @@ where
 	cde.continent <> '';
 
 select * from portfolio.vpopvsvac;
-
-/* Temp Table - additional*/
-drop table if exists PercentPopulationVaccinated;
-
-create table PercentPopulationVaccinated
-(
-Continent varchar(255),
-Location varchar(255),
-Record_date date,
-Population int,
-New_Vaccinations int,
-cumRollingPeople_Vaccinated numeric
-);
-
-insert into PercentPopulationVaccinated
-SELECT 
-    cde.continent,
-    cde.location,
-    cde.record_date,
-    cde.population,
-    cva.new_vaccinations,
-    (sum(cva.new_vaccinations) over (partition by cde.location order by cde.location, cde.record_date)) as cumRollingPeople_Vaccinated
-From
-    cde
-        JOIN
-    cva ON cde.location = cva.location
-        AND cde.record_date = cva.record_date
-where
-	cde.continent <> '';
-
-select * , (cumRollingPeople_Vaccinated/Population)*100 as Total_Vaccinated_Percent
-from PercentPopulationVaccinated;
